@@ -74,6 +74,8 @@ video_direction direct_video_to = VIDEO_TERMINAL;
 
 File root;
 
+String file_to_load = "";
+
 bool expecting_storage_command = false;
 
 enum storage_mode {
@@ -92,7 +94,7 @@ bool is_cold_boot = true; // stays true until we receive the first "/" from the 
 
 // Function headers
 //void load_mon_file(String file_name);
-void send_to_storage_controller(int video_data);
+//void send_to_storage_controller(int video_data);
 
 
 /*

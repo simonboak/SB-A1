@@ -9,7 +9,7 @@ uint8_t keyboard_data;
 void process_keyboard_data()
 {
   if (is_loading_file) {
-    File data_file = SD.open("BOOT.MON");
+    File data_file = SD.open(file_to_load);
     
     if (data_file) {
       while (data_file.available()) {
@@ -37,7 +37,7 @@ void process_keyboard_data()
       data_file.close();
       is_loading_file = false;
     } else {
-      Serial.println("ERROR: FILE 'BOOT.MON' NOT FOUND");
+      Serial.println("ERROR: FILE '" + file_to_load + "' NOT FOUND");
       is_loading_file = false;
     }
   

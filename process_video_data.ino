@@ -37,15 +37,28 @@ void process_video_data() {
 
     if (video_data == 20) { 
       //is_loading_file = true;
-      expecting_storage_command = true;
-    } else {
-      if () {
-        
+      storage_command = ""; // clear the command string buffer
+      expecting_storage_command = true; // all chars from now are a command string until null
+    } else if (expecting_storage_command) {
+      // append to the command string until null
+      if (video_data == 0) {
+        // null ends the command string so trigger the command
+        // do the thing
+        Serial.println("");
+        Serial.println("---");
+        Serial.println(storage_command);
+        Serial.println("---");
+  
+        expecting_storage_command = false;
+        parse_storage_command();
       } else {
-        send_to_video_terminal(video_data);
+        storage_command = storage_command + char(video_data);
       }
-      
+    } else {
+      send_to_video_terminal(video_data);
     }
+      
+
 
 
     // Done receiving this byte.

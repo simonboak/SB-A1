@@ -1,22 +1,39 @@
 
 
+void parse_storage_command() {
+  switch (storage_command.charAt(0)) {
+    case 'C':
+      // print file Catalog
+      root = SD.open("/");
+      print_file_catalog(root);
+      root.close();
+      break;
+    case 'B':
+      // load the Boot file
+      file_to_load = "BOOT.MON";
+      is_loading_file = true;
+      break;
+    case 'L':
+      // Load the requested file
+      file_to_load = "BOOT.MON";
+      is_loading_file = true;
+      break;
+  }
+}
 
-void send_to_storage_controller(int video_data) {
-  /*root = SD.open("/");
-  print_file_catalog(root);
-  root.close();*/
+
+
+/*void send_to_storage_controller(int video_data) {
 
   load_mon_file("BOOT.MON");
 
   
   expecting_storage_command = false;
-}
+}*/
 
 
 
-void parse_filename_character(int video_data) {
-  
-}
+
 
 
 
