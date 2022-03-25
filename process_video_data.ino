@@ -44,15 +44,19 @@ void process_video_data() {
       if (video_data == 0) {
         // null ends the command string so trigger the command
         // do the thing
-        Serial.println("");
-        Serial.println("---");
-        Serial.println(storage_command);
-        Serial.println("---");
+        
   
         expecting_storage_command = false;
         parse_storage_command();
       } else {
         storage_command = storage_command + char(video_data);
+      }
+    } else if (expecting_storage_data) {
+      if (video_data == 3) { // $03 = ETX so stop saving and close the file
+        expecting_storage_data = false;
+        current_file.close();
+      } else {
+        current_file.write((char)video_data);
       }
     } else {
       send_to_video_terminal(video_data);
@@ -64,7 +68,7 @@ void process_video_data() {
     // Done receiving this byte.
     digitalWrite(PIN_RDA, LOW);
     delay(1);
-
+ 
     // Tell the PIA we are ready to receive more data.
     digitalWrite(PIN_RDA, HIGH);
     delay(1);

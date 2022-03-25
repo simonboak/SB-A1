@@ -73,10 +73,13 @@ video_direction direct_video_to = VIDEO_TERMINAL;
 */
 
 File root;
+File current_file;
 
 String file_to_load = "";
+String file_to_save = "";
 
 bool expecting_storage_command = false;
+bool expecting_storage_data = false;
 
 enum storage_mode {
   RECEIVING_FILENAME
@@ -85,6 +88,7 @@ storage_mode storage_mode = RECEIVING_FILENAME;
 
 
 bool is_loading_file = false;
+bool is_saving_file = false;
 
 
 bool is_cold_boot = true; // stays true until we receive the first "/" from the Apple to know that we've reset to the monitor
