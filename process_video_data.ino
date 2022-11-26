@@ -20,50 +20,11 @@ void process_video_data() {
       }
     }
 
-    //send_to_video_terminal(video_data);
-
-    
-
-    /*if (nextCharIsStorageCommand) {
-      send_to_storage_controller(video_data);
-    } else {
-      if (video_data == 20) { 
-        // 20 = $14 = DC4
-        nextCharIsStorageCommand = true;
-      } else {
-        send_to_video_terminal(video_data);
-      }
-    }*/
-
-    if (video_data == 20) { 
-      //is_loading_file = true;
-      storage_command = ""; // clear the command string buffer
-      expecting_storage_command = true; // all chars from now are a command string until null
-    } else if (expecting_storage_command) {
-      // append to the command string until null
-      if (video_data == 0) {
-        // null ends the command string so trigger the command
-        // do the thing
-        
-  
-        expecting_storage_command = false;
-        parse_storage_command();
-      } else {
-        storage_command = storage_command + char(video_data);
-      }
-    } else if (expecting_storage_data) {
-      if (video_data == 3) { // $03 = ETX so stop saving and close the file
-        expecting_storage_data = false;
-        current_file.close();
-      } else {
-        current_file.write((char)video_data);
-      }
-    } else {
-      send_to_video_terminal(video_data);
+    if (expecting_storage_data) {
+      current_file.write((char)video_data);
     }
-      
-
-
+    
+    send_to_video_terminal(video_data);
 
     // Done receiving this byte.
     digitalWrite(PIN_RDA, LOW);
@@ -72,58 +33,38 @@ void process_video_data() {
     // Tell the PIA we are ready to receive more data.
     digitalWrite(PIN_RDA, HIGH);
     delay(1);
-
-
-    
-
-
-
-
-    // Check for cold boot status and if the returned char is '\'
-    /*if ((is_cold_boot) && (video_data == 92)) {
-      is_cold_boot = false;
-      load_mon_file("BOOT.MON");
-    }*/
-    
   }
 }
 
 
 void send_to_video_terminal(int video_data) {
+  // Handle printer control codes
+  if (video_data == 17) {
+    printer_enabled = true;
+  } else if (video_data == 19) {
+    printer_enabled = false;
+  } else if (video_data == 13) {      
+    // Carrage return.
+    Serial.println();
+    column_count = 0;
 
-    // Handle printer control codes
-    if (video_data == 17) {
-      printer_enabled = true;
-    } else if (video_data == 19) {
-      printer_enabled = false;
-    } else if (video_data == 13) {      
-      // Carrage return.
+    if (printer_enabled) {
+      printer.println();
+    }
+  } else if (video_data > 31) {
+    // Display-compatible character.
+    Serial.print((char)video_data);
+
+    // Send carriage return if we're at 40 columns
+    column_count++;
+    if (column_count > 39) {
       Serial.println();
       column_count = 0;
-
-      if (printer_enabled) {
-        printer.println();
-      }
-    } else if (video_data > 31) {
-      // Display-compatible character.
-      Serial.print((char)video_data);
-
-      // Send carriage return if we're at 40 columns
-      column_count++;
-      if (column_count > 39) {
-        Serial.println();
-        column_count = 0;
-      }
-      
-      // Now send it to the printer
-      if (printer_enabled) {
-        printer.print((char)video_data);
-      }
     }
-  
     
-
-    
-
-
+    // Now send it to the printer
+    if (printer_enabled) {
+      printer.print((char)video_data);
+    }
+  }
 }

@@ -63,14 +63,6 @@ uint8_t video_data_pins[] = { PIN_PB0, PIN_PB1, PIN_PB2, PIN_PB3, PIN_PB4, PIN_P
 String storage_command = "";
 
 
-/*
-enum video_direction {
-  VIDEO_TERMINAL,
-  STORAGE_CONTROLLER,
-  ESCAPE_DECODER
-};
-video_direction direct_video_to = VIDEO_TERMINAL;
-*/
 
 File root;
 File current_file;
@@ -78,27 +70,18 @@ File current_file;
 String file_to_load = "";
 String file_to_save = "";
 
-bool expecting_storage_command = false;
+bool receiving_storage_command = false;
 bool expecting_storage_data = false;
 
-enum storage_mode {
-  RECEIVING_FILENAME
-};
-storage_mode storage_mode = RECEIVING_FILENAME;
+
 
 
 bool is_loading_file = false;
 bool is_saving_file = false;
 
 
-bool is_cold_boot = true; // stays true until we receive the first "/" from the Apple to know that we've reset to the monitor
 
 
-
-
-// Function headers
-//void load_mon_file(String file_name);
-//void send_to_storage_controller(int video_data);
 
 
 /*
@@ -129,9 +112,9 @@ void setup() {
   //}
  
   Serial.println();
-  Serial.println("SB-A1");
-  Serial.println("SB ELECTRONICS, 2021");
-  Serial.println("RUUD VAN FALIER, 2017");
+  Serial.println("  SB-A1");
+  Serial.println("  SB ELECTRONICS, 2022");
+  Serial.println("  RUUD VAN FALIER, 2017");
   Serial.println();
 
   // Init printer
@@ -139,16 +122,15 @@ void setup() {
   printer.begin();
 
   if (!SD.begin(SD_CS_PIN)) {
-    Serial.println("NO SD CARD");
+    Serial.println("  [SD CARD NOT FOUND]");
   } else {
-    Serial.println("SD CARD FOUND");
-    Serial.println("PRESS RESET TO BOOT");
+    Serial.println("  [SD CARD INSTALLED]");
 
     root = SD.open("/");
   }
 
   
-
+  clear_status_led(); 
 }
 
 /*
